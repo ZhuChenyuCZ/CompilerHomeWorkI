@@ -59,6 +59,3 @@ int main()
 
     return 0;
 }
-
-curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash -
-yum install nodejs -y
