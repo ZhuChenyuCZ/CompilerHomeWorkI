@@ -141,10 +141,14 @@ int reserver()
 int transNum()
 {
     printf("Int(");
-    for (int i=0;i<TokenLen;i++)
+    int isZero=0;
+    for (int i=0;i<TokenLen-1;i++)
     {
+        if (Token[i]!='0') isZero=1;
+        if (isZero==0) continue;
         printf("%c",Token[i]);
     }
+    printf("%c",Token[TokenLen-1]);
     printf(")\n");
 }
 
