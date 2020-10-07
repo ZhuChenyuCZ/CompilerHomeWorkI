@@ -1,61 +1,231 @@
-//
-//  main.cpp
-//  cpp
-//
-//  Created by ZhuChenyu on 2020/02/14.
-//  Copyright © 2020年 ZhuChenyu. All rights reserved.
-//
-#include<cstdio>
-#include<cstring>
-#include<iostream>
-#include<algorithm>
-#include<queue>
-#include<math.h>
-#define MOD 1000000007
-#define maxn 100120
-#define INF 2147483647
-typedef unsigned float_bits;
+#include<stdio.h>
 
-using namespace std;
+char line[2550];
+int pos;
+char Token[2550];
+int TokenLen,lineLen;
+int NoMore=0;
 
-//priority_queue <int,vector<int>,greater<int> > que;
-
-#define ll long long
-#define rep(i,s,t) for(int i = s;i <= t;i++)
-#define per(i,t,s) for(int i = t;i >= s;i--)
-#define lb(x) x&(-x) 
-#define pi acos(-1)
-#define eps 1e-8
-#define mod 1000000007
-
-int n,m,a,b,c,d;
-int al[maxn],ar[maxn],bl[maxn],br[maxn];
-long long p,q,ans;
-
-int main()
+void clearToken()
 {
-    int i,j,k;
-    scanf("%d%d",&n,&m);
-    for (i=1;i<=n;i++)
-    {
-        scanf("%d%d%d%d",&a,&b,&c,&d);
-        al[i]=a-b; ar[i]=c-d;
-    }
-    for (i=1;i<=m;i++)
-    {
-        scanf("%d%d%d%d",&a,&b,&c,&d);
-        bl[i]=a-b; br[i]=c-d;
-    }
-    sort(bl+1,bl+m+1);
-    sort(br+1,br+m+1);
-    ans=0;
-    for (i=1;i<=n;i++)
-    {
-        p=bl+m+1-upper_bound(bl+1,bl+m+1,ar[i]);
-        q=lower_bound(br+1,br+m+1,al[i])-br-1;
-        ans+=m-p-q;
-    }
-    printf("%lld",ans);
+    memset(Token,0,sizeof(Token));
+    Token[0]='\n';
+    TokenLen=0;
+}
 
+int isSpace()
+{
+    char ch=line[pos];
+    if (ch==' ') return 1; else return 0;
+}
+
+int isNewLine()
+{
+    char ch=line[pos];
+    if (ch=='\n'||ch=='\0') return 1; else return 0;
+}
+
+int isTab()
+{
+    char ch=line[pos];
+    if (ch=='\t') return 1; else return 0;
+}
+
+int isLetter()
+{
+    char ch=line[pos];
+    if ((ch>='a'&& ch<='z')||(ch>='A'&&ch<='Z')) return 1; 
+    else return 0;
+}
+
+int isDigit()
+{
+    char ch=line[pos];
+    if (ch>='0'&&ch<='9') return 1;
+    else return 0;
+}
+
+int isColon()
+{
+    char ch=line[pos];
+    if (ch==':') return 1; else return 0;
+}
+
+int isEqu()
+{
+    char ch=line[pos];
+    if (ch=='=') return 1; else return 0;
+}
+
+int isPlus()
+{
+    char ch=line[pos];
+    if (ch=='+') return 1; else return 0;
+}
+
+int isMinus()
+{
+    char ch=line[pos];
+    if (ch=='-') return 1; else return 0;
+}
+
+int isStar()
+{
+    char ch=line[pos];
+    if (ch=='*') return 1; else return 0;
+}
+
+int isComma()
+{
+    char ch=line[pos];
+    if (ch==',') return 1; else return 0;
+}
+
+int isLpar()
+{
+    char ch=line[pos];
+    if (ch=='(') return 1; else return 0;
+}
+
+int isRpar()
+{
+    char ch=line[pos];
+    if (ch==')') return 1; else return 0;
+}
+
+
+
+void catToken()
+{
+    Token[TokenLen]=line[pos];
+    TokenLen++;
+    Token[TokenLen]='\n';
+}
+
+int reserver()
+{
+    if (strcmp(Token,"BEGIN\n")==0)
+    {
+        printf("Begin\n");
+    }
+    else if (strcmp(Token,"END\n")==0)
+    {
+        printf("End\n");
+    }
+    else if (strcmp(Token,"FOR\n")==0)
+    {
+        printf("For\n");
+    }
+    else if (strcmp(Token,"IF\n")==0)
+    {
+        printf("If\n");
+    }
+    else if (strcmp(Token,"THEN\n")==0)
+    {
+        printf("Then\n");
+    }
+    else if (strcmp(Token,"ELSE\n")==0)
+    {
+        printf("Else\n");
+    }
+    else 
+    {
+        //标识符
+        printf("Ident(");
+        for (int i=0;i<TokenLen;i++) 
+            printf("%c",Token[i]);
+        printf(")\n");
+    }
+}
+
+int transNum()
+{
+    printf("Int(");
+    for (int i=0;i<TokenLen;i++)
+    {
+        printf("%c",Token[i]);
+    }
+    printf(")\n");
+}
+
+int getsym()
+{
+    //printf("%s", line);
+    //printf("pos: %d %c\n",pos,line[pos]);
+    clearToken();
+    if (isNewLine()) 
+    {
+        pos=lineLen+2; 
+        return 0;
+    }
+    while (isSpace()||isTab())
+        pos++;
+    if (isLetter())
+    {
+        while (isLetter()||isDigit())
+        {
+            catToken();
+            pos++;
+        }
+        pos--;
+        reserver();
+    }
+    else if(isDigit())
+    {
+       while(isDigit())
+       {
+           catToken();
+           pos++;
+       }
+       pos--;
+       transNum();
+    }
+    else if(isColon())
+    {
+        pos++;
+        if (isEqu()) printf("Assign\n");
+        else 
+        {
+            pos--;
+            printf("Colon\n");
+        }
+    }
+    else if (isPlus())
+    {
+        printf("Plus\n");
+    }
+    else if (isStar()) printf("Star\n");
+    else if (isComma()) printf("Comma\n");
+    else if (isLpar()) printf("LParenthesis\n");
+    else if (isRpar()) printf("RParenthesis\n");
+    else 
+    { 
+        printf("Unknown\n");
+        NoMore=1;
+    }
+    pos++;
     return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    FILE *fp = NULL;
+ 
+    //fp = fopen("./test.txt", "r");
+    fp = fopen(argv[1], "r");
+    int i=-1;
+    while (fgets(line, 2000, (FILE*)fp)!=NULL)
+    {
+        i++;
+        if (NoMore==1) break;
+        //fscanf(fp, "%s", line);
+        //fgets(line, 2000, (FILE*)fp);
+        //printf("%d: %s\n", i+1, line );
+        //printf("%d\n",strlen(line)-2);
+        lineLen=strlen(line);
+        pos=0;
+        while (pos<lineLen-1&&NoMore==0)
+            getsym();
+    }
+    fclose(fp);
 }
